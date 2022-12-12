@@ -5,21 +5,9 @@ const fetch = require('node-fetch');
 (async function run() {
   console.log('Running report...');
 
-  const city = 'Philadelphia, PA';
-  const countryCode = 'US';
-
-  const locationEndpoint = `http://dataservice.accuweather.com/locations/v1/cities/${countryCode}/search`;
-  const locationRequest = await fetch(`${locationEndpoint}?q=${encodeURIComponent(city)}&apikey=${process.env.ACCUWEATHER_API_KEY}`);
-  const locationData = await locationRequest.json();
-  const locationKey = locationData[0].Key;
-
-  const forecastEndpoint = `http://dataservice.accuweather.com/forecasts/v1/daily/1day/${locationKey}`;
-  const forecastRequest = await fetch(`${forecastEndpoint}?apikey=${process.env.ACCUWEATHER_API_KEY}`);
-  const forecastData = await forecastRequest.json();
-
-  const gifEndpoint = `https://g.tenor.com/v1/trending`;
-  const gifRequest = await fetch(`${gifEndpoint}?contentfilter=low&limit=1&key=${process.env.TENOR_API_KEY}`);
-  const gifData = await gifRequest.json();
+  const date = process.env.currdate
+  const day = process.env.currday
+  const data = process.env.points
 
   const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
@@ -34,24 +22,13 @@ const fetch = require('node-fetch');
   await transporter.sendMail({
     from: process.env.DAILY_REPORT_FROM,
     to: process.env.DAILY_REPORT_TO,
-    subject: 'Daily Report',
+    cc: process.env.DAILY_REPORT_TO_CC,
+    subject: 'Status' + date,
     text: `
-Daily Report
+${data}
 
-Weather
-- Forecast: ${forecastData.Headline.Text}
-- Temp Min: ${forecastData.DailyForecasts[0].Temperature.Minimum.Value}° ${forecastData.DailyForecasts[0].Temperature.Minimum.Unit}
-- Temp Max: ${forecastData.DailyForecasts[0].Temperature.Maximum.Value}° ${forecastData.DailyForecasts[0].Temperature.Maximum.Unit}
-
-Daily Gif: ${gifData.results[0].url}
-    `,
-    html: `
-      <h1>Daily Report</h1>
-      <h2>Weather</h2>
-      <p>Forecast: ${forecastData.Headline.Text}</p>
-      <p>Temp Min: ${forecastData.DailyForecasts[0].Temperature.Minimum.Value}° ${forecastData.DailyForecasts[0].Temperature.Minimum.Unit}</p>
-      <p>Temp Max: ${forecastData.DailyForecasts[0].Temperature.Maximum.Value}° ${forecastData.DailyForecasts[0].Temperature.Maximum.Unit}</p>
-      <p><img src="${gifData.results[0].media[0].tinygif.url}" /></p>
+Thanks & Regards
+Suryansh Mathur
     `,
   });
 

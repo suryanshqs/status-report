@@ -1,17 +1,30 @@
 name: Report
 
 on:
-  schedule:
-    - cron: "0 14 * * *"
   workflow_dispatch:
+    inputs:
+      points:
+        description: 'Status Data'
+        required: true
+        type: string
+      currdate:
+        description: 'Today's Date'
+        required: true
+        type: string
+      currday:
+        description: 'Current Day'
+        required: true
+        type: string
 
 env:
   MAIL_USER: ${{ secrets.MAIL_USER }}
   MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
   DAILY_REPORT_FROM: ${{ secrets.DAILY_REPORT_FROM }}
   DAILY_REPORT_TO: ${{ secrets.DAILY_REPORT_TO }}
-  ACCUWEATHER_API_KEY: ${{ secrets.ACCUWEATHER_API_KEY }}
-  TENOR_API_KEY: ${{ secrets.TENOR_API_KEY }}
+  DAILY_REPORT_TO_CC: ${{ secrets.DAILY_REPORT_TO_CC }}
+  points: ${{ inputs.points }}
+  currdate: ${{ inputs.currdate }}
+  currday: ${{ inputs.currday }}
 
 jobs:
   report:
